@@ -55,8 +55,8 @@ def main():
         try:
             frequency = float(sys.argv[1])
         except ValueError:
-            print("Invalid frequency input, using default of 5")
-            frequency = 5
+            print("Invalid frequency input, exiting")
+            exit(1)
     else:
         frequency = 5
     with Meter() as meter:

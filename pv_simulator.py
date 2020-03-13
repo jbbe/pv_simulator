@@ -16,6 +16,8 @@ import pika
 
 class PVSim:
     def __init__(self, out_file="pv_out.csv", period=5, efficiency=0.75):
+        if efficiency < 0 or efficiency > 1:
+            raise ValueError
         self.out_file = out_file
         self.efficiency = efficiency
 
@@ -55,12 +57,13 @@ class PVSim:
 def main():
     """Create a PV simulator object which listens for meter readings
     and writes output to an output file."""
+    # TODO allow overriding 
     if len(sys.argv) > 1:
         try:
             PVSim(efficiency=float(sys.argv[1]))
         except ValueError:
-            print("Invalid frequency input, using default of 5")
-            pv = PVSim()
+            print("Invalid frequency input, exiting")
+            sys.exit(1)
     else:
         pv = PVSim()
 
