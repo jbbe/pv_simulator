@@ -50,7 +50,7 @@ class PVSim:
             pv_val = self.efficiency * meter_val
             sum_of_powers = meter_val + pv_val
 
-            out_str = f"{now}, {body}, {pv_val}, {sum_of_powers} \n"
+            out_str = f"{now}, {meter_val}, {pv_val}, {sum_of_powers} \n"
             print(out_str)
             f.write(out_str)
 
