@@ -1,24 +1,23 @@
 """
-This file holds the PV class.
+This file holds the PV simulator class.
+
+It accepts meter readings as messages from a readings channel and calculates
+a simulated PV value using an assumed efficiency of 0.75. The efficiency can
+be modified by passing a desired frequency to the program when launching it.
 
 Written by Josh Bell
 """
 import os
+import sys
 import meter
 import time
 import datetime
 import pika
 
 class PVSim:
-    def __init__(self, out_file="pv_out.txt", period=5):
+    def __init__(self, out_file="pv_out.csv", period=5, efficiency=0.75):
         self.out_file = out_file
-
-        self.current_power = 0
-        self.pv_value = 0
-        self.readings_this_hour = 0
-        self.avg_dict = {i : [0, 0.0] for i in range(60) }
-        self.hourly_avg = 0
-        self.last_update_time = 0
+        self.efficiency = efficiency
 
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
         self.channel = self.connection.channel()
@@ -27,47 +26,43 @@ class PVSim:
                                     auto_ack=True,
                                     on_message_callback=self.accept_msg)
         self.channel.start_consuming()
-        # self.channel.queue_declare(queue='readings') 
 
-    def accept_msg(self, ch, method, properties, body):
+    def accept_msg(self, *args):
+        """Accept a message from the broker and write output to file."""
+        # arguments are ch, method, properties, body, we only need body
+        body = args[3]
         with open(self.out_file, 'a') as f:
-            # Writes:
-            # timestamp, 
-            # meter power value, 
-            # PV power value
-            # the sum of the powers (meter + PV
+            """
+            Writes:
+            timestamp,
+            meter power value,
+            PV power value,
+            the sum of the powers (meter + PV)
+            """
             now = datetime.datetime.now()
-            if time.time() - self.last_update_time > 60:
-                self.update_avg()
-            self.readings_this_hour += 1
-            self.avg_dict[now.minute][0] += 1
-            # TODO watch for overflow here
-            self.avg_dict[now.minute][1] += float(body) # TODO convert to int
-            out_str = f"{now} {body} {self.current_power} {self.hourly_avg} \n"
+            try:
+                meter_val = float(body)
+            except ValueError:
+                print("invalid message from meter: ", body)
+                return
+            pv_val = self.efficiency * meter_val
+            sum_of_powers = meter_val + pv_val
+
+            out_str = f"{now}, {body}, {pv_val}, {sum_of_powers} \n"
             print(out_str)
             f.write(out_str)
 
-    def update_avg(self):
-        # Keep dictionary of min stamp
-        new_avg = 0
-        now = datetime.datetime.now()
-        self.last_update_time = time.time()
-        if self.readings_this_hour > 0:
-            for min_avg in self.avg_dict.values():
-                new_avg += (min_avg[0] / self.readings_this_hour) * min_avg[1]
-
-            self.readings_this_hour -= self.avg_dict[now.minute][0]
-            self.avg_dict[now.minute][0] = 0
-            self.avg_dict[now.minute][1] = 0
-        self.hourly_avg = new_avg
-
-    def gen_pv_val(self, new_val):
-        pass
-
-
 def main():
-    pv = PVSim()
-    # while True:
+    """Create a PV simulator object which listens for meter readings
+    and writes output to an output file."""
+    if len(sys.argv) > 1:
+        try:
+            PVSim(efficiency=float(sys.argv[1]))
+        except ValueError:
+            print("Invalid frequency input, using default of 5")
+            pv = PVSim()
+    else:
+        pv = PVSim()
 
 if __name__ == "__main__":
-    main()
+     main()

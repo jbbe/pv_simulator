@@ -6,5 +6,17 @@ setup:
 	rabbitmq-server
 
 run:
-	$(PYTHON) meter.py &
+	# rabbitmq-server &
+	timeout 4
+	$(PYTHON) main.py
+
+meter:
+	# rabbitmq-server &
+	$(PYTHON) meter.py
+
+pv:
 	$(PYTHON) pv_simulator.py 
+
+clean:
+	rm pv_out.csv
+kill-server:
