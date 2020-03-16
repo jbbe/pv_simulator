@@ -20,7 +20,7 @@ Begin by launching the rabbitmq-server.
 ```
 make server
 ```
-When done stop the server by running
+When finished, stop the server by entering
 ```
 make stop
 ```
