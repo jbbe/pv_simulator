@@ -1,5 +1,5 @@
 # PV Simulator Challenge
-This program generates simulated photovoltaic (PV) values in watts derived from power values in watts sent from a simulated meter.
+This program generates simulated photovoltaic (PV) values in KiloWatts derived from power values in Watts sent from a simulated meter.
 
 It is intended to be run with Python 3.7.6 and RabbitMQ 3.8.2
 
