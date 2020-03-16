@@ -37,9 +37,9 @@ class PVSim:
             """
             Writes:
             timestamp,
-            meter power value,
-            PV power value,
-            the sum of the powers (meter + PV)
+            meter power value, (W)
+            PV power value, (KW)
+            the sum of the powers (meter + PV) (KW)
             """
             now = datetime.datetime.now()
             try:
@@ -47,8 +47,8 @@ class PVSim:
             except ValueError:
                 print("invalid message from meter: ", body)
                 return
-            pv_val = self.efficiency * meter_val
-            sum_of_powers = meter_val + pv_val
+            pv_val = (self.efficiency * meter_val) / 1000 
+            sum_of_powers = (meter_val / 1000) + pv_val
 
             out_str = f"{now}, {meter_val}, {pv_val}, {sum_of_powers} \n"
             print(out_str)
