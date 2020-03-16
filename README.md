@@ -16,16 +16,19 @@ $ sudo apt-get install rabbitmq-server
 - `pip3 install -r requirements.txt`
 
 #### Run program
-Begin by either launching rabbitmq-server in another terminal window or running it in the background
+Begin by launching the rabbitmq-server.
 ```
-rabbitmq-server # If running in seperate terminal window
-rabbitmq-server &> /dev/null # If running silently in the background
+make server
 ```
-To use the simulator after installing rabbitmq first launch the rabbitmq server by running `rabbitmq-server` then to launch the meter and the PV simulator together with default values enter `make run`. 
+When done stop the server by running
+```
+make stop
+```
+To use the simulator with default values you can start the meter and the PV simulator together by entering `make run`. 
 
 To run each program seperately enter `make meter` and `make pv` respectively.
 
-If you wish to customize the frequency that meter readings pass the program a float for the desired frequency.
+If you wish to customize the frequency that meter readings are sent out, pass the program a float representing the desired frequency in seconds.
 
 `python3 meter.py <frequency value>`
 

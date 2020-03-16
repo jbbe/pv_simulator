@@ -2,12 +2,12 @@ TESTS := $(wildcard tests/*.in)
 PYTHON := python3
 BROKER_SOURCES := meter.py
 
-setup:
-	rabbitmq-server
+server:
+	/sbin/service rabbitmq-server start
 
+stop:
+	/sbin/service rabbitmq-server stop
 run:
-	# rabbitmq-server &
-	timeout 4
 	$(PYTHON) main.py
 
 meter:
@@ -19,4 +19,3 @@ pv:
 
 clean:
 	rm pv_out.csv
-kill-server:
